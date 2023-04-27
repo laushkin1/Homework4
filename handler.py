@@ -1,13 +1,14 @@
 def input_error(func):
     def inner(*args):
         try:
-            return func(args[0], args[1])
-
+            return func(*args)
         except KeyError:
             return 'This contact is missing.'
         except ValueError:
             return 'Write numbers as phone please.'
         except IndexError:
+            return 'Give me name and phone please.'
+        except TypeError:
             return 'Give me name and phone please.'
     return inner
 
