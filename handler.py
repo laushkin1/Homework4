@@ -1,3 +1,5 @@
+from classes import AddressBook, Name, Phone, Record
+
 def input_error(func):
     def inner(*args):
         try:
@@ -13,7 +15,7 @@ def input_error(func):
     return inner
 
 
-contacts = {}
+contacts = AddressBook()
 
 
 def hello(*args) -> str:
@@ -22,14 +24,19 @@ def hello(*args) -> str:
 
 @input_error
 def add(name: str, phone_number: str) -> str:
-    contacts[str(name)] = int(phone_number)
+    namE = Name()
+    phone_Number = Phone()
+    record = Record()
+    record.record_date(namE.name_user(
+        name), phone_Number.phone_number(phone_number))
+    contacts.add_record(record)
     return 'Done, contact is saved.'
 
 
 @input_error
 def change(name: str, phone_number: str) -> str:
     if name in contacts:
-        contacts[str(name)] = int(phone_number)
+        contacts[name] = phone_number
         return 'Done, number is changed.'
     else:
         raise KeyError

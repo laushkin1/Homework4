@@ -30,7 +30,7 @@ while True:
         command = command.split(' ')
         handler = get_handler(command[0])
         try:
-            print(handler(string_for_name[1], command[2]))
+            print(handler(string_for_name[1], command[2:]))
         except IndexError:
             print(handler(string_for_name[1]))
 
