@@ -1,42 +1,29 @@
-from handler import hello, add, change, phone, show_all
-import re
+from handler import hello, add, change, phone, show, contacts
 
-exit_command = ['good bye', 'close', 'exit', '.']
+exit_command = ['goodbye', 'close', 'exit', '.']
 
-dict_of_commands_with_val = {'add': add,
-                             'change': change,
-                             'phone': phone}
-
-dict_of_commands_without_val = {'hello': hello,
-                                'show all': show_all}
-
-
-def get_handler(func):
-    return dict_of_commands_with_val[func]
+dict_of_commands = {'add': add,
+                    'change': change,
+                    'phone': phone,
+                    'hello': hello,
+                    'show': show}
 
 
 while True:
-    command = input('Enter command: ')
-    command = command.strip()
-    string_for_name = command
-    string_for_name = string_for_name.split(' ')
+    command, *date = input('Enter command: ').strip().split(' ', 1)
     command = command.lower()
 
     if command in exit_command:
         print('Good bye!')
         break
-
-    elif bool(re.search(r'^add |^change |^phone ', command)):
-        command = command.split(' ')
-        handler = get_handler(command[0])
-        try:
-            print(handler(string_for_name[1], command[2:]))
-        except IndexError:
-            print(handler(string_for_name[1]))
-
-    elif command in dict_of_commands_without_val:
-        print(dict_of_commands_without_val[command]())
+    
+    elif dict_of_commands.get(command):
+        handler = dict_of_commands.get(command)
+        if date:
+            date = date[0].split(', ')
+            print(handler(*date))
+        else:
+            print(handler())
 
     else:
         print('Unknown command!')
-
