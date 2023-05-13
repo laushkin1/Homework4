@@ -1,4 +1,4 @@
-from classes import AddressBook, Name, Phone, Record
+from classes import AddressBook, Name, Phone, Record, Birthday
 
 def input_error(func):
     def inner(*args, **kwargs):
@@ -23,12 +23,11 @@ def hello() -> str:
 
 
 @input_error
-def add(name: str, phone_number: str) -> str:
-    name_ = Name(name)
+def add(name: str, phone_number: str, birthday: str =None) -> str:
     phones = Phone(phone_number)
     phones = phones.make_list(phone_number)
     phones = [Phone(val) for val in phones]
-    record = Record(name=name_, phones=phones)
+    record = Record(name=Name(name), phones=phones, birthday=birthday)
     contacts.add_record(record)
     return f'Done, contact is saved.'
 
@@ -55,3 +54,23 @@ def show() -> str:
         return 'You have not any contacts.'
     else:
         return contacts.show_adb()
+
+
+@input_error
+def iterator(n_rec: int) -> str:
+    if len(contacts.records) == 0:
+        return 'You have not any contacts.'
+    else:
+        contacts.add_n_rec(int(n_rec))
+        for i in contacts:
+            print(i)
+        return 'These are all contacts.'
+    
+
+@input_error
+def birthday(name: str) -> str:
+    try:
+        a = contacts.get_records(name)
+        return a.days_to_birthday()
+    except:
+        return 'This contact has no birthday.'

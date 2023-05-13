@@ -1,4 +1,4 @@
-from handler import hello, add, change, phone, show, contacts
+from handler import hello, add, change, phone, show, contacts, iterator, birthday
 
 exit_command = ['goodbye', 'close', 'exit', '.']
 
@@ -6,7 +6,9 @@ dict_of_commands = {'add': add,
                     'change': change,
                     'phone': phone,
                     'hello': hello,
-                    'show': show}
+                    'show': show,
+                    'iterator': iterator,
+                    'birthday': birthday}
 
 
 while True:
@@ -15,7 +17,7 @@ while True:
 
     if command in exit_command:
         print('Good bye!')
-        break
+        break        
     
     elif dict_of_commands.get(command):
         handler = dict_of_commands.get(command)
