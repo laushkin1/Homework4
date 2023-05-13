@@ -8,24 +8,24 @@ class Field:
     def __init__(self, value) -> None:
         self.__value = None
         self.value = value
-    
+
     @property
-    def val(self):
+    def value(self):
         return self.__value
-    
-    @val.setter
-    def val(self, value):
-        self.__value = value
+
+    @value.setter
+    def value(self, new_value):
+        self.__value = new_value
 
 
 class Name(Field):
-    def __init__(self, value) -> None:
+    def __init__(self, value: str) -> None:
         super().__init__(value)
-        
-    @Field.val.setter
-    def name(self, value):
-        if len(value) > 0:
-            Field.val.fset(self, value)
+
+    @Field.value.setter
+    def value(self, value):
+        if len(value) > 1:
+            Field.value.fset(self, value)
         else:
             raise ValueError("The name should be.")
 
@@ -35,12 +35,12 @@ class Phone(Field):
     def __init__(self, value) -> None:
         super().__init__(value)
         
-    @Field.val.setter
-    def phone(self, value: str):
+    @Field.value.setter
+    def value(self, value):
         if value.replace(' ', '').isdigit():
-            Field.val.fset(self, value)
+            Field.value.fset(self, value)
         else:
-            raise ValueError("This number is invalid.")
+            raise ValueError("This number is invalid.\nThe number must be numbers, no other characters")
     
     def make_list(self, phones: str):
         phones = phones.split(' ')
@@ -48,9 +48,9 @@ class Phone(Field):
 
 
 class Birthday(Field):
-    def __init__(self, birthday: str) -> None:
-        super().__init__(birthday)
-        birthday = birthday.split('.')
+    def __init__(self, value: str) -> None:
+        super().__init__(value)
+        birthday = value.split('.')
 
         self.day = int(birthday[0])
         self.month = int(birthday[1])
@@ -60,8 +60,8 @@ class Birthday(Field):
             year=int(datetime.now().year),
             month=int(birthday[1]), day=int(birthday[0]))
         
-    @Field.val.setter
-    def birth(self, value):
+    @Field.value.setter
+    def value(self, value):
         current_datetime = datetime.now()
         if re.search("^\d\d\.\d\d\.\d\d\d\d$", value):
             value = value.split('.')
@@ -71,14 +71,14 @@ class Birthday(Field):
                     month=int(value[1]),
                     day=int(value[0]))
             except ValueError:
-                raise ValueError("This birthday is invalid.")
+                raise ValueError("This birthday is invalid.\nPlease enter 'dd.mm.yyyy'")
         else:
             birthday = current_datetime
 
         if birthday < current_datetime:
-            return Field.val.fset(self, value)
+            Field.value.fset(self, value)
         else:
-            raise ValueError("This birthday is invalid.")
+            raise ValueError("This birthday is invalid.\nPlease enter 'dd.mm.yyyy'")
 
     def days_to_birthday(self):
         if (self.birthday - datetime.now()).days >= 0:
@@ -144,10 +144,14 @@ class Iterator:
     def __next__(self):
         if self.index <= len(self.adbook):
             res = ''
-            for name, numbers in self.adbook[self.index:self.n_rec]:
-                res += f"{name}: {numbers}\n"
+            for name, numbers, birthday in self.adbook[self.index:self.n_rec]:
+                if birthday == None:
+                    res += f"{name}: {numbers}\n"
+                else:
+                    res += f"{name}: {numbers}\t{name}`s birthday: {birthday}\n"
             self.index = self.n_rec
             self.n_rec += self.n_rec
+            
             return res
         else:
             raise StopIteration
@@ -178,7 +182,10 @@ class AddressBook(UserDict, Field):
     def get_tuple(self):
         res = []
         for name, record in self.records.items():
-            res.append((name, record.show_phones()))
+            try:
+                res.append((name, record.show_phones(), record.get_birthday()))
+            except:
+                res.append((name, record.show_phones(), None))
         return res
 
     def get_records(self, name: str):
@@ -189,4 +196,3 @@ class AddressBook(UserDict, Field):
     
     def __iter__(self) -> Iterator:
         return Iterator(n_rec=self.n_rec, adbook=self.get_tuple())
-

@@ -74,3 +74,4 @@ def birthday(name: str) -> str:
         return a.days_to_birthday()
     except:
         return 'This contact has no birthday.'
+    
