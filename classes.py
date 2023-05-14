@@ -49,15 +49,7 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, birthday: str) -> None:
         self.value = birthday
-        
-        birthday = birthday.split('.')
-        self.day = int(birthday[0])
-        self.month = int(birthday[1])
-        self.year = int(birthday[2])                            # Not used
-
-        self.birthday = datetime(
-            year=int(datetime.now().year),
-            month=int(birthday[1]), day=int(birthday[0]))
+        self.birthday = self.value.replace(year=datetime.now().year)
         
     @Field.value.setter
     def value(self, birthday):
@@ -94,7 +86,7 @@ class Record(Birthday, Field):
             self.add_phone(phone)
             
     def get_birthday(self):
-        return f"{self.birthday.day}.{self.birthday.month}.{self.year}"
+        return f"{self.birthday.day}.{self.birthday.month}.{self.value.year}"
             
         
     def add_phone(self, phone: Phone | str):
