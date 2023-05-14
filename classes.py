@@ -1,44 +1,43 @@
 from collections import UserDict
 from collections.abc import Iterator
 from datetime import datetime
-import re
 
 
 class Field:
     def __init__(self, value) -> None:
-        self.__value = None
         self.value = value
 
     @property
     def value(self):
-        return self.__value
+        return self._value
 
     @value.setter
     def value(self, new_value):
-        self.__value = new_value
+        self._value = new_value
 
 
 class Name(Field):
-    def __init__(self, value: str) -> None:
-        super().__init__(value)
+    def __init__(self, name: str) -> None:
+        self.value = name
 
     @Field.value.setter
-    def value(self, value):
-        if len(value) > 1:
-            Field.value.fset(self, value)
+    def value(self, name):
+        if len(name) > 1:
+            Field.value.fset(self, name)
         else:
             raise ValueError("The name should be.")
 
 
 
 class Phone(Field):
-    def __init__(self, value) -> None:
-        super().__init__(value)
+    def __init__(self, phone) -> None:
+        self.value = phone
+        
         
     @Field.value.setter
-    def value(self, value):
-        if value.replace(' ', '').isdigit():
-            Field.value.fset(self, value)
+    def value(self, phone):
+        if phone.replace(' ', '').isdigit():
+            Field.value.fset(self, phone)
         else:
             raise ValueError("This number is invalid.\nThe number must be numbers, no other characters")
     
@@ -48,10 +47,10 @@ class Phone(Field):
 
 
 class Birthday(Field):
-    def __init__(self, value: str) -> None:
-        super().__init__(value)
-        birthday = value.split('.')
-
+    def __init__(self, birthday: str) -> None:
+        self.value = birthday
+        
+        birthday = birthday.split('.')
         self.day = int(birthday[0])
         self.month = int(birthday[1])
         self.year = int(birthday[2])                            # Not used
@@ -61,24 +60,12 @@ class Birthday(Field):
             month=int(birthday[1]), day=int(birthday[0]))
         
     @Field.value.setter
-    def value(self, value):
-        current_datetime = datetime.now()
-        if re.search("^\d\d\.\d\d\.\d\d\d\d$", value):
-            value = value.split('.')
-            try:
-                birthday = datetime(
-                    year=int(value[2]),
-                    month=int(value[1]),
-                    day=int(value[0]))
-            except ValueError:
-                raise ValueError("This birthday is invalid.\nPlease enter 'dd.mm.yyyy'")
-        else:
-            birthday = current_datetime
-
-        if birthday < current_datetime:
-            Field.value.fset(self, value)
-        else:
-            raise ValueError("This birthday is invalid.\nPlease enter 'dd.mm.yyyy'")
+    def value(self, birthday):
+        try:
+            dt = datetime.strptime(birthday, '%d.%m.%Y')
+        except (ValueError, TypeError):
+            raise Exception("Invalid birthday. Only string format dd.mm.yyyy")
+        Field.value.fset(self, dt.date())
 
     def days_to_birthday(self):
         if (self.birthday - datetime.now()).days >= 0:
