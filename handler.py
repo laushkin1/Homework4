@@ -15,7 +15,7 @@ def input_error(func):
     return inner
 
 
-contacts = AddressBook()
+contacts = AddressBook('data.bin')
 
 
 def hello() -> str:
@@ -75,3 +75,9 @@ def birthday(name: str) -> str:
     except:
         return 'This contact has no birthday.'
     
+
+@input_error
+def search(value: str) -> str:
+    if contacts.search(value) != {}:
+        return contacts.search(value)
+    return 'Nothing was found for your search.'

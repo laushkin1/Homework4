@@ -1,6 +1,8 @@
 from collections import UserDict
 from collections.abc import Iterator
 from datetime import datetime
+from pathlib import Path
+import pickle
 
 
 class Field:
@@ -60,9 +62,11 @@ class Birthday(Field):
         Field.value.fset(self, dt.date())
 
     def days_to_birthday(self):
+        self.birthday = datetime.combine(
+            self.birthday, datetime.min.time())
+        
         if (self.birthday - datetime.now()).days >= 0:
             return (self.birthday - datetime.now()).days
-
         else:
             if datetime.now().year % 4:
                 # 365 days for year
@@ -86,9 +90,8 @@ class Record(Birthday, Field):
             self.add_phone(phone)
             
     def get_birthday(self):
-        return f"{self.birthday.day}.{self.birthday.month}.{self.value.year}"
-            
-        
+        return f"{self.birthday.day}.{self.birthday.month}.{self.value.year}"     
+       
     def add_phone(self, phone: Phone | str):
         if isinstance(phone, str):
             phone = self.create_phone(phone)
@@ -138,15 +141,36 @@ class Iterator:
 
 
 class AddressBook(UserDict, Field):
-
-    def __init__(self, record: Record | None = None, n_rec=5) -> None:
+    def __init__(self, filename, record: Record | None = None, n_rec=5) -> None:
         self.n_rec = n_rec
         self.records = {}
+        self.file = Path(filename)
+        self.deserialize()
         if record is not None:
             self.add_record(record)
 
     def add_record(self, record: Record):
         self.records[record.get_name()] = record
+        
+    def search(self, search_str: str):
+        result = {} 
+        for name, record in self.records.items():
+            if search_str in name or ','.join(record.show_phones()).__contains__(search_str):
+                result[name] = record.show_phones()
+        return result
+    
+    def serialize(self):
+        with open(self.file, "wb") as file:
+            pickle.dump(self.records, file)
+            
+    def deserialize(self):
+        if not self.file.exists():
+            return None
+        try:
+            with open(self.file, "rb") as file:
+                self.records = pickle.load(file)
+        except EOFError:
+            return None
 
     def show_adb(self):
         for name, record in self.records.items():

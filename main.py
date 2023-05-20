@@ -1,4 +1,4 @@
-from handler import hello, add, change, phone, show, contacts, iterator, birthday
+from handler import hello, add, change, phone, show, contacts, iterator, birthday, search
 
 exit_command = ['goodbye', 'close', 'exit', '.']
 
@@ -8,7 +8,8 @@ dict_of_commands = {'add': add,
                     'hello': hello,
                     'show': show,
                     'iterator': iterator,
-                    'birthday': birthday}
+                    'birthday': birthday,
+                    'search': search}
 
 
 while True:
@@ -16,6 +17,7 @@ while True:
     command = command.lower()
 
     if command in exit_command:
+        contacts.serialize()
         print('Good bye!')
         break        
     
